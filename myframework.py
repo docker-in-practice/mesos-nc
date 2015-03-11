@@ -105,16 +105,17 @@ class TestScheduler(mesos.interface.Scheduler):
             tasks = [self._makeTask(tid, offer.slave_id.value, selectedPort)]
             driver.launchTasks(offer.id, tasks)
 
-#driver = None
-#
-#def signal_handler(signal, frame):
-#    print("Got Ctrl+C, quitting")
-#    sys.exit(0)
-#    if driver is not None:
-#        driver.stop()
-#
-#signal.signal(signal.SIGINT, signal_handler)
-#signal.signal(signal.SIGTERM, signal_handler)
+driver = None
+driver_thread = None
+
+def signal_handler(signal, frame):
+    print("Got Ctrl+C, quitting")
+    if driver_thread is not None:
+        driver.stop()
+        driver_thread.join()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -133,6 +134,6 @@ if __name__ == "__main__":
     framework.user = "" # Have Mesos fill in the current user.
     framework.name = "Test Framework (Python)"
     driver = mesos.native.MesosSchedulerDriver(scheduler, framework, masterUrl)
-    #t = threading.Thread(target=driver.run)
-    #t.start()
-    driver.run()
+    driver_thread = threading.Thread(target=driver.run)
+    driver_thread.start()
+    signal.pause()
