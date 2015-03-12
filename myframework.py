@@ -10,9 +10,8 @@ import mesos.interface
 from mesos.interface import mesos_pb2
 import mesos.native
 
-numtasks = 0
 baseport = 8000
-maxport = 8000
+maxport = 8005
 
 CPUS_REQUIRED = 0.1
 MEM_REQUIRED = 20
@@ -96,7 +95,8 @@ class TestScheduler(mesos.interface.Scheduler):
             ))
 
             if offerCpus < CPUS_REQUIRED or offerMem < MEM_REQUIRED or selectedPort is None:
-                print("Skipping offer")
+                print("Declining offer")
+                driver.declineOffer(offer.id)
                 continue
 
             tid = self._numtasks
