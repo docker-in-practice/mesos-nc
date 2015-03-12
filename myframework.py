@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import os
 import sys
-import time
 import signal
 import threading
 
@@ -79,7 +78,6 @@ class TestScheduler(mesos.interface.Scheduler):
                     offerMem += resource.scalar.value
                 elif resource.name == "ports":
                     selectedPort = None
-                    #import pdb; pdb.set_trace()
                     for portrange in resource.ranges.range:
                         offerPorts.append("{}-{}".format(portrange.begin, portrange.end))
                         if selectedPort:
