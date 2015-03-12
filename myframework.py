@@ -45,7 +45,7 @@ class TestScheduler(mesos.interface.Scheduler):
         portmapping.host_port = portmapping.container_port = port
         portmapping.protocol = 'tcp'
 
-        task.command.value = "echo hello | nc -l {}".format(port)
+        task.command.value = "echo 'hello {}' | nc -l {}".format(tid, port)
 
         cpus = task.resources.add()
         cpus.name = "cpus"
