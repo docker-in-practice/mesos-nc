@@ -35,7 +35,6 @@ class TestScheduler(mesos.interface.Scheduler):
         task.task_id.value = str(tid)
         task.slave_id.value = slave_id_value
         task.name = "task %d" % tid
-        #task.executor.MergeFrom(self.executor)
 
         # https://github.com/apache/mesos/blob/2985ae05634038b70f974bbfed6b52fe47231418/include/mesos/mesos.proto#L992
         task.container.type = task.container.DOCKER
@@ -120,12 +119,6 @@ if __name__ == "__main__":
         print("Usage: {} <master:port>".format(sys.argv[0]))
         sys.exit(1)
     masterUrl = sys.argv[1]
-
-    #executor = mesos_pb2.ExecutorInfo()
-    #executor.executor_id.value = "default"
-    #executor.command.value = os.path.abspath("./test-executor")
-    #executor.name = "Test Executor (Python)"
-    #executor.source = "python_test"
 
     scheduler = TestScheduler()
     framework = mesos_pb2.FrameworkInfo()
