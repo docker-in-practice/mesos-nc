@@ -15,7 +15,7 @@ maxport = 8005
 
 # Resource requirements for any task we start
 CPUS_REQUIRED = 0.1
-MEM_REQUIRED = 20
+MEM_REQUIRED = 16
 
 class TestScheduler(mesos.interface.Scheduler):
 
