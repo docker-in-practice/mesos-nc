@@ -114,11 +114,14 @@ class TestScheduler(mesos.interface.Scheduler):
                     offerMem += resource.scalar.value
                 elif resource.name == "ports":
                     selectedPort = None
+                    # Mesos represents port resource offers as a number of
+                    # ranges so consider each range in turn.
                     for portrange in resource.ranges.range:
                         offerPorts.append("{}-{}".format(portrange.begin, portrange.end))
                         if selectedPort:
                             continue
-                        # Select a port in the range we've defined as acceptable
+                        # If any of the possible ports are within the offered
+                        # port range, select it.
                         for possiblePort in range(minport, maxport+1):
                             if portrange.begin <= possiblePort <= portrange.end:
                                 selectedPort = possiblePort
