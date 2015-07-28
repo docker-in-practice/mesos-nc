@@ -17,9 +17,11 @@ maxport = 8005
 CPUS_REQUIRED = 0.1
 MEM_REQUIRED = 16
 
+# All schedulers should subclass the base mesos scheduler
 class TestScheduler(mesos.interface.Scheduler):
 
-    # On startup, initialise the number of running tasks.
+    # `__init__` is the function Python calls when constructing an object - on
+    # creation, initialise the number of started tasks.
     def __init__(self):
         self._numtasks = 0
 
@@ -113,19 +115,20 @@ class TestScheduler(mesos.interface.Scheduler):
                 elif resource.name == "mem":
                     offerMem += resource.scalar.value
                 elif resource.name == "ports":
-                    selectedPort = None
-                    # Mesos represents port resource offers as a number of
-                    # ranges so consider each range in turn.
+                    # Keep a record of all of the port ranges mesos has offered.
                     for portrange in resource.ranges.range:
                         offerPorts.append("{}-{}".format(portrange.begin, portrange.end))
-                        if selectedPort:
-                            continue
+                    # Consider each port range in turn to try and find a port.
+                    selectedPort = None
+                    for portrange in resource.ranges.range:
                         # If any of the possible ports are within the offered
                         # port range, select it.
                         for possiblePort in range(minport, maxport+1):
                             if portrange.begin <= possiblePort <= portrange.end:
                                 selectedPort = possiblePort
                                 break
+                        if selectedPort:
+                            break
 
             print("Received offer {}. cpus: {}, mem: {}, ports: {}".format(
                 offer.id.value, offerCpus, offerMem, ",".join(offerPorts)
@@ -145,7 +148,8 @@ class TestScheduler(mesos.interface.Scheduler):
             self._numtasks += 1
 
             # Use the helper function to create a task object, and ask mesos to
-            # launch it.
+            # launch it. It has to be put into a list as it's theoretically
+            # possible to launch more than one task per offer.
             tasks = [self._makeTask(tid, offer.slave_id.value, selectedPort)]
             driver.launchTasks(offer.id, tasks)
 
